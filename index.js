@@ -16,8 +16,8 @@ const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
 
-//app.use(helmet());
-//app.use(compression()); //Compress all routes
+app.use(helmet());
+app.use(compression()); //Compress all routes
 app.use(
   bodyParser.urlencoded({
     extended: true

@@ -3,6 +3,8 @@ const http = require("http");
 const express = require("express");
 const socketio = require("socket.io");
 const cors = require("cors");
+const bodyParser = require("body-parser");
+const jsonParser = bodyParser.json();
 
 const { addUser, removeUser, getUser, getUsersInRoom } = require("./users");
 const router = require("./router");
@@ -11,8 +13,16 @@ const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
 
+app.use(
+  bodyParser.urlencoded({
+    extended: true
+  })
+)
+app.use(jsonParser);
 app.use(cors());
 app.use(router);
+
+
 
 io.on("connect", (socket) => {
   socket.on("join", ({ name, room }, callback) => {

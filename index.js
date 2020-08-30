@@ -5,6 +5,9 @@ const socketio = require("socket.io");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const jsonParser = bodyParser.json();
+const compression = require('compression');
+const helmet = require('helmet');
+
 
 const { addUser, removeUser, getUser, getUsersInRoom } = require("./users");
 const router = require("./router");
@@ -13,6 +16,8 @@ const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
 
+app.use(helmet());
+app.use(compression()); //Compress all routes
 app.use(
   bodyParser.urlencoded({
     extended: true

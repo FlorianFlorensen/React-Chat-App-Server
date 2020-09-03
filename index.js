@@ -1,16 +1,15 @@
 const PORT = process.env.PORT;
-const http = require("http");
-const express = require("express");
-const socketio = require("socket.io");
-const cors = require("cors");
-const bodyParser = require("body-parser");
+const http = require('http');
+const express = require('express');
+const socketio = require('socket.io');
+const cors = require('cors');
+const bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
 const compression = require('compression');
 const helmet = require('helmet');
 
-
-const { addUser, removeUser, getUser, getUsersInRoom } = require("./users");
-const router = require("./router");
+const { addUser, removeUser, getUser, getUsersInRoom } = require('./users');
+const router = require('./router');
 
 const app = express();
 const server = http.createServer(app);
@@ -20,17 +19,15 @@ app.use(helmet());
 app.use(compression()); //Compress all routes
 app.use(
   bodyParser.urlencoded({
-    extended: true
-  })
-)
+    extended: true,
+  }),
+);
 app.use(jsonParser);
 app.use(cors());
 app.use(router);
 
-
-
-io.on("connect", (socket) => {
-  socket.on("join", ({ name, room }, callback) => {
+io.on('connect', (socket) => {
+  socket.on('join', ({ name, room }, callback) => {
     const { error, user } = addUser({ id: socket.id, name, room });
 
     if (error) {
@@ -39,15 +36,15 @@ io.on("connect", (socket) => {
 
     socket.join(user.room);
 
-    socket.emit("message", {
-      user: "admin",
+    socket.emit('message', {
+      user: 'admin',
       text: `${user.name}, welcome to room ${user.room}.`,
     });
     socket.broadcast
       .to(user.room)
-      .emit("message", { user: "admin", text: `${user.name} has joined!` });
+      .emit('message', { user: 'admin', text: `${user.name} has joined!` });
 
-    io.to(user.room).emit("roomData", {
+    io.to(user.room).emit('roomData', {
       room: user.room,
       users: getUsersInRoom(user.room),
     });
@@ -55,23 +52,23 @@ io.on("connect", (socket) => {
     callback();
   });
 
-  socket.on("sendMessage", (message, callback) => {
+  socket.on('sendMessage', (message, callback) => {
     const user = getUser(socket.id);
 
-    io.to(user.room).emit("message", { user: user.name, text: message });
+    io.to(user.room).emit('message', { user: user.name, text: message });
 
     callback();
   });
 
-  socket.on("disconnect", () => {
+  socket.on('disconnect', () => {
     const user = removeUser(socket.id);
 
     if (user) {
-      io.to(user.room).emit("message", {
-        user: "Admin",
+      io.to(user.room).emit('message', {
+        user: 'Admin',
         text: `${user.name} has left.`,
       });
-      io.to(user.room).emit("roomData", {
+      io.to(user.room).emit('roomData', {
         room: user.room,
         users: getUsersInRoom(user.room),
       });
@@ -79,6 +76,4 @@ io.on("connect", (socket) => {
   });
 });
 
-server.listen(PORT || 5000, () =>
-  console.log(`Server has started.`)
-);
+server.listen(PORT || 5000, () => console.log(`Server has started.`));

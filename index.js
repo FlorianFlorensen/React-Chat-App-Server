@@ -76,4 +76,6 @@ io.on('connect', (socket) => {
   });
 });
 
+console.log('object');
+
 server.listen(PORT || 5000, () => console.log(`Server has started.`));
